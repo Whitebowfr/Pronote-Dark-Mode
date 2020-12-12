@@ -3,8 +3,6 @@ function store(name, value) {
     console.log('"' + value + '" successfully stored with key "' + name + '"');
 }
 
-changeNameStartup();
-
 function changeNameStartup() {
     if (localStorage.getItem("keep")) { //only change the image/name if the "keep" var is set to true
         document.getElementsByClassName("ibe_util_texte ibe_actif").item(0).innerText = localStorage.getItem("name");
