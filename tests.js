@@ -41,3 +41,5 @@ function previousValue(el) {
 function changeStyle(tochange, val) {
     document.documentElement.style.setProperty('--' + tochange, val);
 }
+
+setTimeout(function(){changeNameStartup();}, 500)
