@@ -1,0 +1,18 @@
+{
+    "manifest_version": 2,
+    "name": "Modify CSS and HTML",
+    "version": "0.1.0",
+    "description": "Lateral blog post demo extension",
+    "background": {
+        "scripts": ["background.js", "jquery-3.4.1.min.js"]
+    },
+    "content_scripts": [{
+        "matches": ["https://*/pronote*.html"],
+        "js": ["content.js", "jquery-3.4.1.min.js"]
+    }],
+    "permissions": [
+        "declarativeNetRequest",
+        "declarativeNetRequestFeedback",
+        "http://192.168.1.10:8003/*"
+    ]
+}
