@@ -13,6 +13,8 @@
     "permissions": [
         "declarativeNetRequest",
         "declarativeNetRequestFeedback",
-        "http://192.168.1.10:8003/*"
+        "http://192.168.1.10:8003/*",
+        "http://192.168.1.119:8003/",
+        "http://thomas.conseil.pro.dns-orange.fr:8003/*"
     ]
 }

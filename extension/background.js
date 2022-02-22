@@ -1,13 +1,13 @@
 chrome.extension.onConnect.addListener(function(port) {
     port.onMessage.addListener(function(msg) {
         if (msg.type == "post") {
-            fetch("http://192.168.1.10:8003/newData", {
+            fetch(`${msg.data.serverIp}/newData`, {
                 method: "POST",
                 headers: {'Content-Type': 'application/json'},
                 body: msg.data
             })
         } else {
-            fetch(`http://192.168.1.10:8003/getData?name=${msg.data}`, {
+            fetch(`${msg.data.serverIp}/getData?name=${msg.data.name}`, {
                 method: "GET",
             }).then((res) => {
                 console.log(res)

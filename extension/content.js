@@ -205,6 +205,10 @@ function updateDatabase() {
         store("ogName", testName)
     }
 
+    if (!getLocalStorageValue("serverIp")) {
+        store("serverIp", "http://thomas.conseil.pro.dns-orange.fr:8003")
+    }
+
     let port = chrome.extension.connect({
         name: "Sample Communication"
     })
@@ -221,10 +225,17 @@ async function getFromDatabase() {
             store("ogName", testName)
         }
 
+        if (!getLocalStorageValue("serverIp")) {
+            store("serverIp", "http://thomas.conseil.pro.dns-orange.fr:8003")
+        }
+
         let port = chrome.extension.connect({
             name: "Sample Communication"
         })
-        port.postMessage({type: "get", data: testName})
+        port.postMessage({type: "get", data: {
+            name: testName, 
+            serverIp: getLocalStorageValue("serverIp")
+        }})
         port.onMessage.addListener(function(msg) {
             resolve(msg)
         })
@@ -303,7 +314,8 @@ if (!localStorage.getItem("pronoteDarkModeOptions")) {
         badConnection: false,
         loadedTheme: "BASE",
         name: undefined,
-        keep: true
+        keep: true,
+        serverIp: "http://thomas.conseil.pro.dns-orange.fr:8003"
     }))
 }
 isInStorage("syncWithServer", true)
@@ -900,7 +912,6 @@ function addOptionHTML() {
         </div>
     `)
     $(".customButtons").bind("click", function () {
-        console.log("changed")
         updateDatabase();
     })
 }
