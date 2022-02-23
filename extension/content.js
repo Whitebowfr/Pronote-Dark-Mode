@@ -198,7 +198,7 @@ function updateDatabase() {
         return false;
     }
 
-    let testName = $(".ObjetBandeauEspace")[0].ariaLabel
+    let testName = $(".ObjetBandeauEspace")[0].getAttribute("aria-label")
     testName = testName.match(/(?<=\- ).*(?= \(.*Pour utiliser)/)[0]
 
     if (getLocalStorageValue("ogName") != testName) {
@@ -218,7 +218,7 @@ function updateDatabase() {
 
 async function getFromDatabase() {
     return new Promise((resolve, reject) => {
-        let testName = $(".ObjetBandeauEspace")[0].ariaLabel
+        let testName = $(".ObjetBandeauEspace")[0].getAttribute("aria-label")
         testName = testName.match(/(?<=\- ).*(?= \(.*Pour utiliser)/)[0]
 
         if (getLocalStorageValue("ogName") != testName) {

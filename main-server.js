@@ -32,13 +32,13 @@ app.post("/newData", (request) => {
         profile_picture: data.profilePic
     }
     pool.getConnection((err, conn) => {
-        if (err) throw err
+        if (err) console.log("[ERROR] " + err)
         conn.query("SELECT * FROM users_settings WHERE name=?", [post.name], (erro, results) => {
-            if (erro) throw erro
+            if (erro) console.log("[ERROR] " + erro)
             if (results.length == 0) {
                 // Create new user
                 conn.query("INSERT INTO users_settings SET ?", post, (error, results) => {
-                    if (error) throw error
+                    if (error) console.log("[ERROR] " + error)
                 })
             } else {
                 // Update existing user
@@ -47,7 +47,7 @@ app.post("/newData", (request) => {
                 delete current["ID"]
                 if (post != current) {
                     conn.query("UPDATE users_settings SET ? WHERE name=? LIMIT 1", [post, post.name], (error, results) => {
-                        if (error) throw error
+                        if (error) console.log("[ERROR] " + error)
                     })
                 }
             }
@@ -61,14 +61,18 @@ app.get("/getData", (request, response) => {
     response.set('Content-Type', 'text/plain');
 
     pool.getConnection((err, conn) => {
-        if (err) throw err
+        if (err) console.log("[ERROR] " + err)
         conn.query("SELECT * FROM users_settings WHERE name = ?", [name], (error, results) => {
-            if (error) throw error
-            response.send(JSON.stringify(results[0]).replaceAll(/[\\\\]"/gmi, '"').replaceAll(/"{/gm, '{').replaceAll(/}"/gm, "}"))
+            if (error) console.log("[ERROR] " + error)
+            if (results.length == 0) {
+                response.send("{}")
+            } else {
+                response.send(JSON.stringify(results[0]).replaceAll(/[\\\\]"/gmi, '"').replaceAll(/"{/gm, '{').replaceAll(/}"/gm, "}"))
+            }
         })
     })
 })
 
-http.listen(8003, "192.168.1.10", function() {
+http.listen(8003, "192.168.1.119", function() {
     console.log('listening on 8003')
 })
