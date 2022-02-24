@@ -164,11 +164,13 @@ function changeOverallTheme(the, val) {
 }
 
 function getCurrentTheme() {
-    document.querySelector("#div").classList.forEach(element => {
+    let theme
+    $("#div")[0].classList.forEach(element => {
         if(element.includes("Theme")) {
-            return element
+            theme = element
         }
     });
+    return theme
 }
 
 function getLocalStorageValue(key) {
@@ -768,6 +770,7 @@ div.SansSelectionTexte {
     padding: 4rem;
     max-width: 100%;
     display: inline-block;
+    background-position-x: center;
 }
 
 .mainOptionDiv {
