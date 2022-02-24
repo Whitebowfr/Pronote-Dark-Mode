@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Pronote Dark Mode",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "description": "Une extension permettant de customiser le site Pronote, maintenant avec une synchronisation cloud !",
     "background": {
         "scripts": ["background.js", "data/jquery-3.4.1.min.js"]

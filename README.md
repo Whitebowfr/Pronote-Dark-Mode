@@ -18,7 +18,7 @@ Deux méthodes sont possibles :
 2. Dans le menu dépliant, cliquer sur "Download ZIP"
 ![Voici les étapes à effectuer](https://i.imgur.com/VTAKNtf.png)
 3. La suite est commune aux deux méthodes
-#### Deuxième méthode :
+#### Deuxième méthode (attention, les extensions sorties par ce moyen seront probablement moins à jour):
 1. Sur Github, cliquez sur la dernière version sortie de l'extension (sous "Releases")
 2. Cliquez sur le .zip avec un icône de cube
 
