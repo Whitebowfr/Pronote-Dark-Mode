@@ -211,11 +211,7 @@ function updateDatabase() {
         store("serverIp", "http://thomas.conseil.pro.dns-orange.fr:8003")
     }
 
-    let port = chrome.extension.connect({
-        name: "Sample Communication"
-    })
-
-    port.postMessage({type: "post", data: localStorage.getItem("pronoteDarkModeOptions")})
+    chrome.runtime.sendMessage({type: "post", data: localStorage.getItem("pronoteDarkModeOptions")});
 }
 
 async function getFromDatabase() {
@@ -447,8 +443,8 @@ function launchJS() {
 
             document.getElementById("badConnection").checked = getLocalStorageValue("badConnection")
 
-            document.getElementById("optionsName").placeholder = getLocalStorageValue("name") || document.getElementsByClassName("ibe_util_texte ibe_actif").item(0).innerText || ""
-            document.getElementById("optionsBackgroundUrl").value = getLocalStorageValue("backgroundUrl") || ""
+            document.getElementById("optionsName").value = getLocalStorageValue("name") || document.getElementsByClassName("ibe_util_texte ibe_actif").item(0).innerText || ""
+            document.getElementById("optionsBackgroundUrl").placeholder = getLocalStorageValue("backgroundUrl") || ""
         }
     }
 
