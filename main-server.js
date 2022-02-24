@@ -19,7 +19,7 @@ app.get("/", (request, res) => {
     res.send("Test successful")
 })
 
-app.post("/newData", (request) => {
+app.post("/newData", (request, res) => {
     let data = request.body
     
     let post = {
@@ -31,6 +31,7 @@ app.post("/newData", (request) => {
         custom_name: data.name,
         profile_picture: data.profilePic
     }
+
     pool.getConnection((err, conn) => {
         if (err) console.log("[ERROR] " + err)
         conn.query("SELECT * FROM users_settings WHERE name=?", [post.name], (erro, results) => {
@@ -38,6 +39,8 @@ app.post("/newData", (request) => {
             if (results.length == 0) {
                 // Create new user
                 conn.query("INSERT INTO users_settings SET ?", post, (error, results) => {
+                    conn.release()
+                    res.end()
                     if (error) console.log("[ERROR] " + error)
                 })
             } else {
@@ -47,30 +50,31 @@ app.post("/newData", (request) => {
                 delete current["ID"]
                 if (post != current) {
                     conn.query("UPDATE users_settings SET ? WHERE name=? LIMIT 1", [post, post.name], (error, results) => {
+                        conn.release()
+                        res.end()
                         if (error) console.log("[ERROR] " + error)
                     })
                 }
             }
         })
-        conn.release()
     })
 })
 
 app.get("/getData", (request, response) => {
     const name = request.query.name
     response.set('Content-Type', 'text/plain');
-
     pool.getConnection((err, conn) => {
         if (err) console.log("[ERROR] " + err)
         conn.query("SELECT * FROM users_settings WHERE name = ?", [name], (error, results) => {
+            conn.release()
             if (error) console.log("[ERROR] " + error)
             if (results.length == 0) {
                 response.send("{}")
             } else {
                 response.send(JSON.stringify(results[0]).replaceAll(/[\\\\]"/gmi, '"').replaceAll(/"{/gm, '{').replaceAll(/}"/gm, "}"))
             }
+            response.end()
         })
-        conn.release()
     })
 })
 
