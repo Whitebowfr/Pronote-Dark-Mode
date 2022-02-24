@@ -52,7 +52,7 @@ app.post("/newData", (request) => {
                 }
             }
         })
-        
+        conn.release()
     })
 })
 
