@@ -325,7 +325,7 @@ function replaceLocalStorageWithSynced(sync) {
     let og = localStorage.getItem("pronoteDarkModeOptions");
     og = JSON.parse(og);
     og.ogName = sync.name ?? "";
-    og.backgroundUrl = sync.backgroundUrl ?? "";
+    og.backgroundUrl = sync.background_url ?? "";
     og.loadedTheme = sync.loaded_theme ?? "BASE";
     og.name = sync.custom_name ?? "";
     og.profilePic = sync.profile_picture ?? "";
