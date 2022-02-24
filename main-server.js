@@ -70,6 +70,7 @@ app.get("/getData", (request, response) => {
                 response.send(JSON.stringify(results[0]).replaceAll(/[\\\\]"/gmi, '"').replaceAll(/"{/gm, '{').replaceAll(/}"/gm, "}"))
             }
         })
+        conn.release()
     })
 })
 
