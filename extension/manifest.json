@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Pronote Dark Mode",
-    "version": "0.6.2",
+    "version": "0.6.5",
     "description": "Une extension permettant de customiser le site Pronote, maintenant avec une synchronisation cloud !",
     "background": {
         "scripts": ["background.js", "data/jquery-3.4.1.min.js"]
@@ -14,8 +14,7 @@
         "default_icon": "data/icon.png"
     },
     "permissions": [
-        "declarativeNetRequest",
-        "declarativeNetRequestFeedback",
+        "notifications",
         "http://192.168.1.10:8003/*",
         "http://192.168.1.119:8003/",
         "http://thomas.conseil.pro.dns-orange.fr:8003/*"
