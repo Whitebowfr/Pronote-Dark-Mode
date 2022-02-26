@@ -91,13 +91,19 @@ var customThemes = {
     }
 }
 
+//--------------------------- Start of JS injection ---------------------------------
 var customJS = document.createElement('script');
 customJS.type = "text/javascript"
 customJS.innerHTML += /* JS */ `
-
 function previousValue(el) {
     return el.previousElementSibling.value
 }
+
+/**
+ * Stores a key-value pair in the local storage
+ * @param {String} name The key of the element you want to store
+ * @param {Any} value The value you want to store
+ */
 function store(name, value) {
     if (name == "tryLimit" || name == "tryTiming") {
         if (value < 20 || value === null) {
@@ -196,8 +202,48 @@ function deleteLocalStorage(key) {
     localStorage.setItem("pronoteDarkModeOptions", JSON.stringify(tmp))
     changeCustomTheme(tmp["loadedTheme"])
 }
+
+const XHR = XMLHttpRequest.prototype
+
+const open = XHR.open
+const send = XHR.send
+const setRequestHeader = XHR.setRequestHeader
+
+XHR.open = function () {
+    this._requestHeaders = {}
+
+    return open.apply(this, arguments)
+}
+
+XHR.setRequestHeader = function (header, value) {
+    this._requestHeaders[header] = value
+    return setRequestHeader.apply(this, arguments)
+}
+
+XHR.send = function () {
+    this.addEventListener('load', function () {
+        const url = this.responseURL
+        const responseHeaders = this.getAllResponseHeaders()
+        try {
+            if (this.responseType != 'blob') {
+                let responseBody
+                if (this.responseType === '' || this.responseType === 'text') {
+                    responseBody = JSON.parse(this.responseText)
+                } else /* if (this.responseType === 'json') */ {
+                    responseBody = this.response
+                }
+                console.log(responseBody)
+            }
+        } catch (err) {
+            console.debug("Error reading or processing response.", err)
+        }
+    })
+
+    return send.apply(this, arguments)
+}
 `
 // ----------------------------- End of JS injection -----------------------------------
+
 function changeStyle(tochange, val) {
     if (tochange == "badConnectionBackground") {
         tochange = "backgroundUrl"
@@ -314,7 +360,7 @@ function isInStorage(key, val, force=false) {
     }
 }
 
-document.getElementsByTagName('head')[0].appendChild(customJS);
+(document.head || document.documentElement).appendChild(customJS);
 
 if (!localStorage.getItem("pronoteDarkModeOptions")) {
     localStorage.setItem("pronoteDarkModeOptions", JSON.stringify({
@@ -396,15 +442,16 @@ var counterBis = setInterval(() => {
         console.error("Failed to detect login page, retrying stopped");
         clearInterval(counterBis);
     } else {
-        if (document.querySelector("#id_42 > div.InlineBlock.Texte10")) { //detect if homepage is fully loaded (when using autologin)
+        if ($("button:contains('Se connecter')")) { //detect if homepage is fully loaded (when using autologin)
+            startGlobalCSS()
             console.log("Login page loaded successfully after " + (loginTries * tryTiming) / 1000 + " s (try " + (loginTries + 1) + ")")
             clearInterval(counter);
             clearInterval(counterBis);
 
-            var loginBtn = document.querySelector("#id_39");
-            loginBtn.addEventListener('click', () => resetCounter(), false); //fire checkLoadHome at click on the "connect" button
-            document.addEventListener('keydown', () => {
-                if (keyCode === 13 && (loginBtn == null || !loginBtn.disabled)) {
+            var loginBtn = $("button:contains('Se connecter')");
+            loginBtn.bind('click', () => resetCounter(), false); //fire checkLoadHome at click on the "connect" button
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 13 && (loginBtn == null || !loginBtn.disabled)) {
                     resetCounter()
                 };
             }, false); //fire checkLoadHome when hitting Enter
@@ -413,7 +460,6 @@ var counterBis = setInterval(() => {
 }, tryTiming);
 
 function launchJS() {
-    
     
     var globalMenu = $("span:contains('Accueil')").parents("div[class^='menu']")[0]
 
@@ -524,39 +570,60 @@ function addLinks() {
     }, 500)
 }
 
-localStorage.setItem("etatAffichageFooter_3", true); //Get rid of the useless footer
 
-addGlobalStyle( /* css */ `
-@keyframes gradient {
-    0% {
-        background-position: 0% 50%;
+function startGlobalCSS() {
+    localStorage.setItem("etatAffichageFooter_3", true); //Get rid of the useless footer
+
+    addGlobalStyle( /* css */ `
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
     }
-    50% {
-        background-position: 100% 50%;
+
+    a.LienLouvre {
+        display: none !important;
     }
-    100% {
-        background-position: 0% 50%;
+
+    img[id^="id_"].AvecMain {
+        display: none;
     }
-}
 
-a.LienLouvre {
-    display: none !important;
-}
+    #div {
+        background-image: var(--loadingScreenUrl) !important;
+        background-size: cover;
+        ${getLocalStorageValue("badConnection") ? `background-size: 400% 400%;
+        animation: gradient 10s ease infinite;` : ""}
+    }
 
-img[id^="id_"].AvecMain {
-    display: none;
-}
+    div.bloc-elem + div.bloc-elem {
+        margin-left: 0% !important;
+    }
 
-#div {
-    background-image: var(--loadingScreenUrl) !important;
-    ${getLocalStorageValue("badConnection") ? `background-size: 400% 400%;
-    animation: gradient 10s ease infinite;` : ""}
-}
-`)
-if (!getLocalStorageValue("badConnection")) {
-        changeStyle("loadingScreenUrl", 'url("https://s3-eu-west-1.amazonaws.com/sales-i-wordpress/wp-content/uploads/2015/12/17112848/black-background.jpg")')
-} else {
-        changeStyle("loadingScreenUrl", `linear-gradient(-45deg, #81412e, #982853, #1c7a9c, #1a9f80)`)
+    div.loginBox > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) {
+        width: 23vw !important;
+    }
+
+    div.loginBox > div:nth-child(1) > div:nth-child(2) > div > input {
+        font-size: 1.4rem !important;
+    }
+
+    button[title='Cliquez sur le bouton "Se connecter".'] {
+        font-size: 2rem !important;
+    }
+
+    `)
+    if (!getLocalStorageValue("badConnection")) {
+            changeStyle("loadingScreenUrl", 'url("https://s3-eu-west-1.amazonaws.com/sales-i-wordpress/wp-content/uploads/2015/12/17112848/black-background.jpg")')
+    } else {
+            changeStyle("loadingScreenUrl", `linear-gradient(-45deg, #81412e, #982853, #1c7a9c, #1a9f80)`)
+    }
 }
 
 function launchCSS() {
