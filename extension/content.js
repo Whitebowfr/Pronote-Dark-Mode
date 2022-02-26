@@ -442,7 +442,7 @@ var counterBis = setInterval(() => {
         console.error("Failed to detect login page, retrying stopped");
         clearInterval(counterBis);
     } else {
-        if ($("button:contains('Se connecter')")) { //detect if homepage is fully loaded (when using autologin)
+        if ($("button:contains('Se connecter')")[0]) { //detect if homepage is fully loaded (when using autologin)
             startGlobalCSS()
             console.log("Login page loaded successfully after " + (loginTries * tryTiming) / 1000 + " s (try " + (loginTries + 1) + ")")
             clearInterval(counter);
