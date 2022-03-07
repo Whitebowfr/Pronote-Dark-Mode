@@ -232,7 +232,7 @@ XHR.send = function () {
                 } else /* if (this.responseType === 'json') */ {
                     responseBody = this.response
                 }
-                console.log(responseBody)
+                handleRequestResponse(responseBody)
             }
         } catch (err) {
             console.debug("Error reading or processing response.", err)
@@ -240,6 +240,30 @@ XHR.send = function () {
     })
 
     return send.apply(this, arguments)
+}
+
+function handleRequestResponse(resp) {
+    if (resp.nom) {
+        switch(resp.nom) {
+            case "DernieresNotes":
+                addNotesDetails(resp)
+                break;
+        }
+    }
+}
+
+function addNotesDetails(resp) {
+    let matieres = resp?.donneesSec?.donnees?.listeServices.V
+    let number = matieres.length
+    
+    let total = matieres.reduce((prev, cur) => prev + parseFloat(cur?.moyEleve.V.replace(",", ".")), 0) / number
+    let ogNode = $("td.EspaceGauche10")[0]
+    let duplicate = ogNode.cloneNode(true)
+    duplicate.firstElementChild.innerHTML = ""
+    let frag = document.createRange().createContextualFragment(${'`<div class="BlocDevoirEvaluation"><div class="BlocDevoirEvaluation_Titre"><span class="Gras">MOYENNE GÉNÉRALE</span></div><div class="BlocDevoirEvaluation_Contenu"><div class="Espace"><table style="width:100%;">  <tbody><tr> <td style="width:50%;" class="AlignementHaut"><table><tbody><tr><td class="AlignementDroit"></td><td class="Gras">${total.toString().replace(".", ",")}</td></tr></tbody></table> </td> </tr></tbody></table></div></div></div>`'})
+    duplicate.firstElementChild.appendChild(frag)
+    console.log(duplicate)
+    ogNode.parentNode.appendChild(duplicate)
 }
 `
 // ----------------------------- End of JS injection -----------------------------------
@@ -289,6 +313,9 @@ async function getFromDatabase() {
         let port = chrome.extension.connect({
             name: "Sample Communication"
         })
+
+        console.log("connected")
+        console.log(port)
         port.postMessage({type: "get", data: {
             name: testName, 
             serverIp: getLocalStorageValue("serverIp")
@@ -430,12 +457,15 @@ function checkLoadHome() { //Check if home page is loaded
 var counter = setInterval(() => checkLoadHome(), tryTiming); //since checkLoadHome is a defined function (unlike the login one), this is needed to fire it at launch
 
 var loginTries = 0
+
+var resetCounter = () => {
+    tries = 0;
+    clearInterval(counter);
+    counter = setInterval(() => checkLoadHome(), tryTiming);
+}
+
 var counterBis = setInterval(() => {
-    var resetCounter = () => {
-        tries = 0;
-        clearInterval(counter);
-        counter = setInterval(() => checkLoadHome(), tryTiming);
-    }
+    
     loginTries++
 
     if (loginTries >= tryLimit) {
@@ -451,7 +481,7 @@ var counterBis = setInterval(() => {
             var loginBtn = $("button:contains('Se connecter')");
             loginBtn.bind('click', () => resetCounter(), false); //fire checkLoadHome at click on the "connect" button
             document.addEventListener('keydown', (e) => {
-                if (e.code === 13 && (loginBtn == null || !loginBtn.disabled)) {
+                if (e.code == "Enter" && (loginBtn == null || !loginBtn.disabled)) {
                     resetCounter()
                 };
             }, false); //fire checkLoadHome when hitting Enter
@@ -464,7 +494,6 @@ function launchJS() {
     var globalMenu = $("span:contains('Accueil')").parents("div[class^='menu']")[0]
 
     changeCustomTheme(getLocalStorageValue("loadedTheme"))
-
 
     if (!document.getElementById('optionBouton')) {
         var optionBtn = document.createElement("li");
