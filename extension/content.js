@@ -211,7 +211,6 @@ const setRequestHeader = XHR.setRequestHeader
 
 XHR.open = function () {
     this._requestHeaders = {}
-
     return open.apply(this, arguments)
 }
 
@@ -221,8 +220,10 @@ XHR.setRequestHeader = function (header, value) {
 }
 
 XHR.send = function () {
-    this.addEventListener('load', function () {
+    this.addEventListener('load', function () {    
+        
         const url = this.responseURL
+        console.log(JSON.stringify(this.responseURL))
         const responseHeaders = this.getAllResponseHeaders()
         try {
             if (this.responseType != 'blob') {
@@ -254,15 +255,26 @@ function handleRequestResponse(resp) {
 
 function addNotesDetails(resp) {
     let matieres = resp?.donneesSec?.donnees?.listeServices.V
-    let number = matieres.length
+    let number = 0
     
-    let total = matieres.reduce((prev, cur) => prev + parseFloat(cur?.moyEleve.V.replace(",", ".")), 0) / number
+    let total = 0;
+    matieres.forEach(cur => {
+        let current = parseFloat(cur?.moyEleve.V.replace(",", "."))
+        if (!isNaN(current)) {
+            total += current
+            number++
+        }
+    });
+    total /= number
+
     let ogNode = $("td.EspaceGauche10")[0]
     let duplicate = ogNode.cloneNode(true)
-    duplicate.firstElementChild.innerHTML = ""
+    if ($("td.EspaceGauche10").length > 1) {
+        $("td.EspaceGauche10")[1].remove()
+    }
+    
     let frag = document.createRange().createContextualFragment(${'`<div class="BlocDevoirEvaluation"><div class="BlocDevoirEvaluation_Titre"><span class="Gras">MOYENNE GÉNÉRALE</span></div><div class="BlocDevoirEvaluation_Contenu"><div class="Espace"><table style="width:100%;">  <tbody><tr> <td style="width:50%;" class="AlignementHaut"><table><tbody><tr><td class="AlignementDroit"></td><td class="Gras">${total.toString().replace(".", ",")}</td></tr></tbody></table> </td> </tr></tbody></table></div></div></div>`'})
     duplicate.firstElementChild.appendChild(frag)
-    console.log(duplicate)
     ogNode.parentNode.appendChild(duplicate)
 }
 `
